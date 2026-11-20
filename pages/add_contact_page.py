@@ -70,3 +70,7 @@ class ContactPage(BasePage):
         """Checks if a contact card with the given phone number appears in the list"""
         locator = (By.XPATH, f"//h3[contains(text(),'{phone}')]")
         return self.is_visible(locator)
+
+    def contact_save_button_visible(self) -> bool:
+        """Checks if the contact Save button is still visible on the form."""
+        return self.is_visible(self.SAVE_BUTTON)

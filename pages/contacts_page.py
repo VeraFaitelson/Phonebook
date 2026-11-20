@@ -74,8 +74,18 @@ class ContactsPage(BasePage):
 
     def contact_email(self) -> str:
         """Extracts the email address from the detailed card text"""
-        card = self.find(self.DETAILS_CARD)
-        return card.text.split()[3]
+        lines = self.find(self.DETAILS_CARD).text.splitlines()
+        return lines[2]
+
+    def contact_address(self) -> str:
+        """Extracts the address line from the detailed card text"""
+        lines = self.find(self.DETAILS_CARD).text.splitlines()
+        return lines[3]
+
+    def contact_description(self) -> str:
+        """Extracts the description line from the detailed card text"""
+        lines = self.find(self.DETAILS_CARD).text.splitlines()
+        return lines[4]
 
     def get_contact_cards_number(self) -> int:
         """Returns the current count of contact cards in the list"""
