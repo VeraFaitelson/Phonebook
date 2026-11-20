@@ -1,50 +1,42 @@
-from selenium.common import TimeoutException
+"""Page Object for the Registration page"""
+
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
+
+from models.user import User
+from pages.base_page import BasePage
 
 
-class RegistrationPage:
+class RegistrationPage(BasePage):
+    """Encapsulates locators and actions for creating a new user account"""
+
+    # Locators (registration and login share the same tab on this site)
     REGISTRATION_LINK = (By.XPATH, "//a[text()='LOGIN']")
     EMAIL_INPUT = (By.NAME, "email")
     PASSWORD_INPUT = (By.NAME, "password")
     BUTTON_REGISTRATION = (By.CSS_SELECTOR, "button[name='registration']")
     SIGN_OUT_BUTTON = (By.XPATH, "//*[text()='Sign Out']")
 
-    def __init__(self, driver):
-        self.driver = driver
-
     def open_registration_page(self):
-        self.driver.find_element(*self.REGISTRATION_LINK).click()
+        """Navigates to the Login/Registration tab"""
+        self.click(self.REGISTRATION_LINK)
 
-    def fill_email_field(self,email):
-        self.driver.find_element(*self.EMAIL_INPUT).clear()
-        self.driver.find_element(*self.EMAIL_INPUT).send_keys(email)
+    def fill_email_field(self, email: str):
+        """Enters email into the registration email input field"""
+        self.fill(self.EMAIL_INPUT, email)
 
-    def fill_password_field(self,password):
-        self.driver.find_element(*self.PASSWORD_INPUT).clear()
-        self.driver.find_element(*self.PASSWORD_INPUT).send_keys(password)
+    def fill_password_field(self, password: str):
+        """Enters password into the registration password input field"""
+        self.fill(self.PASSWORD_INPUT, password)
+
+    def fill_registration_form(self, user: User):
+        """Fills both email and password fields using a User model"""
+        self.fill_email_field(user.email)
+        self.fill_password_field(user.password)
 
     def click_on_registration_button(self):
-        self.driver.find_element(*self.BUTTON_REGISTRATION).click()
+        """Clicks the Registration submit button"""
+        self.click(self.BUTTON_REGISTRATION)
 
-    # def is_sign_out_displayed(self):
-    #     return self.driver.find_element(*self.SIGN_OUT_BUTTON).is_displayed()
-
-    def is_sign_out_displayed(self):
-        try:
-            WebDriverWait(self.driver, timeout=10).until(
-                expected_conditions.visibility_of_element_located(self.SIGN_OUT_BUTTON)
-            )
-            return True
-        except TimeoutException:
-            return False
-
-    def get_alert_text(self):
-        alert = WebDriverWait(self.driver, 10).until(
-            expected_conditions.alert_is_present()
-        )
-        return alert.text
-    def accept_alert(self):
-        self.driver.switch_to.alert.accept()
-
+    def is_sign_out_displayed(self) -> bool:
+        """Checks if the 'Sign Out' button is visible (confirms successful registration)"""
+        return self.is_visible(self.SIGN_OUT_BUTTON)
