@@ -34,9 +34,10 @@ class ContactsPage(BasePage):
         return By.XPATH, f"//h3[contains(text(),'{phone}')]"
 
     def open_contacts_list(self):
-        """Navigates to the Contacts page and waits for the URL to update"""
+        """Navigates to the Contacts page and waits for contact cards to load"""
         self.click(self.CONTACTS_LINK)
         self.wait.until(EC.url_contains("/contacts"))
+        self.wait.until(EC.visibility_of_element_located(self.CONTACTS_CARDS))
 
     def contact_cards_visible(self, phone: str) -> bool:
         """Checks if a contact card with the specified phone number is visible"""
@@ -47,7 +48,8 @@ class ContactsPage(BasePage):
         self.click(self.get_card_locator(phone))
 
     def open_edit_mode(self):
-        """Switches the opened contact details card into edit mode"""
+        """Stores current card text and switches the contact details card into edit mode"""
+        self._old_card_text = self.find(self.DETAILS_CARD).text
         self.click(self.BUTTON_EDIT)
 
     def set_edit_mode(self, locator, value: str):
@@ -55,9 +57,10 @@ class ContactsPage(BasePage):
         self.fill(locator, value)
 
     def submit_edit(self):
-        """Saves changes and waits until the edit form closes"""
+        """Saves changes and waits until the edit form closes and card text updates"""
         self.click(self.EDIT_SAVE_BUTTON)
         self.wait.until(EC.invisibility_of_element_located(self.EDIT_SAVE_BUTTON))
+        self.wait.until(lambda d: self.find(self.DETAILS_CARD).text != self._old_card_text)
 
     def contact_name(self) -> str:
         """Extracts the first name from the detailed card header"""
@@ -94,3 +97,5 @@ class ContactsPage(BasePage):
         while self.get_contact_cards_number() > 0:
             self.open_first_contact()
             self.remove_contact()
+
+
