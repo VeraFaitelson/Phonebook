@@ -1,10 +1,13 @@
 """Tests for editing existing contact fields"""
+
+import logging
 import pytest
 
 from pages.add_contact_page import ContactPage
 from pages.contacts_page import ContactsPage
 from utils.data_generator import fake, generate_contact
 
+logger = logging.getLogger(__name__)
 
 def test_edit_contact_name_field(authenticated):
     """Verify updating a contact's first name"""
@@ -49,6 +52,7 @@ def test_edit_contact_phone_field(authenticated):
     contact_page.create_contact_steps(contact)
     new_phone = fake.numerify(text="050#######")
 
+    logger.info("Updating contact phone: %s -> %s", contact.phone, new_phone)
     contacts_page.open_contact_details_card(contact.phone)
     contacts_page.open_edit_mode()
     contacts_page.set_edit_mode(contacts_page.EDIT_PHONE_INPUT, new_phone)

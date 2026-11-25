@@ -1,10 +1,11 @@
 """Page Object for the Contacts list, details view, editing, and deletion"""
-
+import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 from pages.base_page import BasePage
 
+logger=logging.getLogger(__name__)
 
 class ContactsPage(BasePage):
     """Encapsulates locators and actions for managing existing contacts"""
@@ -35,32 +36,40 @@ class ContactsPage(BasePage):
 
     def open_contacts_list(self):
         """Navigates to the Contacts page and waits for contact cards to load"""
+        logger.debug("Opening contacts list page")
         self.click(self.CONTACTS_LINK)
         self.wait.until(EC.url_contains("/contacts"))
         self.wait.until(EC.visibility_of_element_located(self.CONTACTS_CARDS))
 
     def contact_cards_visible(self, phone: str) -> bool:
         """Checks if a contact card with the specified phone number is visible"""
+        logger.info("Opening contact details card: %s", phone)
         return self.is_visible(self.get_card_locator(phone))
 
     def open_contact_details_card(self, phone: str):
         """Clicks on a contact card by phone number to open its details"""
+        logger.info(f"Opening contact details card: {phone}")
         self.click(self.get_card_locator(phone))
 
     def open_edit_mode(self):
         """Stores current card text and switches the contact details card into edit mode"""
+        logger.info("Opening edit mode")
         self._old_card_text = self.find(self.DETAILS_CARD).text
+        logger.debug("Current card text before edit: %r", self._old_card_text)
         self.click(self.BUTTON_EDIT)
 
     def set_edit_mode(self, locator, value: str):
         """Updates a specific input field while in edit mode"""
+        logger.info("Updating field %s with value: '%s'", locator[1], value)
         self.fill(locator, value)
 
     def submit_edit(self):
         """Saves changes and waits until the edit form closes and card text updates"""
+        logger.debug("Submitting contact edit form")
         self.click(self.EDIT_SAVE_BUTTON)
         self.wait.until(EC.invisibility_of_element_located(self.EDIT_SAVE_BUTTON))
         self.wait.until(lambda d: self.find(self.DETAILS_CARD).text != self._old_card_text)
+        logger.debug("Contact card text successfully updated")
 
     def contact_name(self) -> str:
         """Extracts the first name from the detailed card header"""
@@ -99,11 +108,15 @@ class ContactsPage(BasePage):
     def remove_contact(self):
         """Clicks 'Remove' and waits until the card count decreases by one"""
         initial_count = self.get_contact_cards_number()
+        logger.debug("Removing contact (cards before: %s)", initial_count)
         self.click(self.BUTTON_REMOVE)
         self.wait.until(lambda d: self.get_contact_cards_number() < initial_count)
 
     def remove_all_contacts(self):
         """Iteratively opens and removes all contacts until the list is empty"""
+        total = self.get_contact_cards_number()
+        if total > 0:
+            logger.info("Removing all %s contacts", total)
         while self.get_contact_cards_number() > 0:
             self.open_first_contact()
             self.remove_contact()

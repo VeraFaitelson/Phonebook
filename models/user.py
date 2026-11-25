@@ -1,6 +1,6 @@
 """User data model for authorization and registration"""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -13,4 +13,4 @@ class User:
     - __eq__ (comparison of objects based on the values of their fields)
     """
     email: str
-    password: str
+    password: str = field (repr=False)

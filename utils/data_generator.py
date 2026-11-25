@@ -22,6 +22,6 @@ def generate_contact(with_description: bool = True) -> Contact:
         last_name=fake.last_name(),
         phone=fake.numerify("05########"),
         email=fake.unique.email(),
-        address=fake.address(),
+        address=fake.address().replace("\n", ", "),
         description=description,
     )

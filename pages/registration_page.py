@@ -1,9 +1,12 @@
 """Page Object for the Registration page"""
+import logging
 
 from selenium.webdriver.common.by import By
 
 from models.user import User
 from pages.base_page import BasePage
+
+logger = logging.getLogger(__name__)
 
 
 class RegistrationPage(BasePage):
@@ -18,6 +21,7 @@ class RegistrationPage(BasePage):
 
     def open_registration_page(self):
         """Navigates to the Login/Registration tab"""
+        logger.info("Opening Registration form")
         self.click(self.REGISTRATION_LINK)
 
     def fill_email_field(self, email: str):
@@ -26,10 +30,11 @@ class RegistrationPage(BasePage):
 
     def fill_password_field(self, password: str):
         """Enters password into the registration password input field"""
-        self.fill(self.PASSWORD_INPUT, password)
+        self.fill(self.PASSWORD_INPUT, password, mask=True)
 
     def fill_registration_form(self, user: User):
         """Fills both email and password fields using a User model"""
+        logger.info("Filling registration form for user: %s", user.email)
         self.fill_email_field(user.email)
         self.fill_password_field(user.password)
 
@@ -39,4 +44,6 @@ class RegistrationPage(BasePage):
 
     def is_sign_out_displayed(self) -> bool:
         """Checks if the 'Sign Out' button is visible (confirms successful registration)"""
-        return self.is_visible(self.SIGN_OUT_BUTTON)
+        visible = self.is_visible(self.SIGN_OUT_BUTTON)
+        logger.debug("Sign Out button displayed after registration: %s", visible)
+        return visible

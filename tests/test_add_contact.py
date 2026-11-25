@@ -1,23 +1,24 @@
 """Tests for adding new contacts"""
+import logging
 
 from pages.add_contact_page import ContactPage
 from utils.data_generator import generate_contact
 
+logger = logging.getLogger(__name__)
 
 def test_add_contact_success(authenticated):
     """Verify creating a contact with all fields populated"""
     contact_page = ContactPage(authenticated)
     contact = generate_contact(with_description=True)
 
-    contact_page.open_contact_form()
-    contact_page.fill_contact(contact)
-    contact_page.submit_contact()
+    contact_page.create_contact_steps(contact)
 
     assert contact_page.contact_card_visible(contact.phone)
 
 
 def test_add_contact_only_required_fields(authenticated):
     """Verify creating a contact when optional 'description' field is left empty"""
+    logging.info("test_edit_contact_phone_field")
     contact_page = ContactPage(authenticated)
     contact = generate_contact(with_description=False)
 
@@ -33,6 +34,7 @@ def test_negative_add_contact_with_invalid_telephone(authenticated):
     contact = generate_contact()
     contact.phone = "123"  # Invalid phone: shorter than 10 digits
 
+    logger.info("Testing invalid phone number: '%s'", contact.phone)
     contact_page.open_contact_form()
     contact_page.fill_contact(contact)
     contact_page.submit_contact()
@@ -47,6 +49,7 @@ def test_negative_add_contact_with_invalid_email(authenticated):
     contact = generate_contact()
     contact.email = "testgmail.com"  # Invalid email
 
+    logger.info("Testing invalid email: '%s'", contact.email)
     contact_page.open_contact_form()
     contact_page.fill_contact(contact)
     contact_page.submit_contact()
@@ -61,6 +64,7 @@ def test_negative_add_contact_with_empty_name(authenticated):
     contact = generate_contact()
     contact.name = ""  # Empty name
 
+    logger.info("Testing with empty name", contact.name)
     contact_page.open_contact_form()
     contact_page.fill_contact(contact)
     contact_page.submit_contact()
@@ -73,6 +77,7 @@ def test_negative_add_contact_with_empty_last_name(authenticated):
     contact = generate_contact()
     contact.last_name = ""  # Empty last name
 
+    logger.info("Testing with empty last name", contact.last_name)
     contact_page.open_contact_form()
     contact_page.fill_contact(contact)
     contact_page.submit_contact()
@@ -86,6 +91,7 @@ def test_negative_add_contact_with_empty_address(authenticated):
     contact = generate_contact()
     contact.address = ""  # Empty address
 
+    logger.info("Testing with empty address", contact.address)
     contact_page.open_contact_form()
     contact_page.fill_contact(contact)
     contact_page.submit_contact()

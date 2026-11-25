@@ -1,10 +1,11 @@
 """Page Object for the Add Contact form"""
-
+import logging
 from selenium.webdriver.common.by import By
 
 from models.contact import Contact
 from pages.base_page import BasePage
 
+logger = logging.getLogger(__name__)
 
 class ContactPage(BasePage):
     """Encapsulates locators and actions for creating a new contact"""
@@ -49,6 +50,7 @@ class ContactPage(BasePage):
 
     def fill_contact(self, contact: Contact):
         """Fills all contact form fields using a Contact model"""
+        logger.debug("Filling contact form with data: %s", contact)
         self.fill_name(contact.name)
         self.fill_last_name(contact.last_name)
         self.fill_phone(contact.phone)
@@ -62,6 +64,7 @@ class ContactPage(BasePage):
 
     def create_contact_steps(self, contact: Contact):
         """Full workflow: opens the form, fills all fields, and saves the contact"""
+        logger.info("Creating contact: %s", contact.phone)
         self.open_contact_form()
         self.fill_contact(contact)
         self.submit_contact()
@@ -69,8 +72,12 @@ class ContactPage(BasePage):
     def contact_card_visible(self, phone: str) -> bool:
         """Checks if a contact card with the given phone number appears in the list"""
         locator = (By.XPATH, f"//h3[contains(text(),'{phone}')]")
-        return self.is_visible(locator)
+        visible = self.is_visible(locator)
+        logger.debug("Contact card with phone '%s' visible: %s", phone, visible)
+        return visible
 
     def contact_save_button_visible(self) -> bool:
         """Checks if the contact Save button is still visible on the form."""
-        return self.is_visible(self.SAVE_BUTTON)
+        visible = self.is_visible(self.SAVE_BUTTON)
+        logger.debug("Contact Save button visible: %s", visible)
+        return visible
